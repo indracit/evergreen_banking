@@ -6,6 +6,7 @@ import ServicesPage from '../pages/services';
 import Layout from '../pages/layout';
 import LoginPage from '../pages/login';
 import GetStartedPage from '../pages/getstarted';
+import Dashboard from '../pages/dashboard';
 
 export default function RouteList() {
   return (
@@ -17,7 +18,7 @@ export default function RouteList() {
          <Route path="getstarted" element={<GetStartedPage />} />
       </Route>
        <Route path="login" element={<LoginPage />} />
-      
+       <Route path="dashboard" element={<Dashboard />} />
     </Routes>
   );
 }

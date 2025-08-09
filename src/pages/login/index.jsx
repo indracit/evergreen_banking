@@ -1,7 +1,7 @@
 
 import styled from 'styled-components';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import useSWRMutation from "swr/mutation";
 
  const loginRequest =  async (url, { arg }) => {
@@ -17,7 +17,7 @@ import useSWRMutation from "swr/mutation";
       }
       return response.json();
     }
-    
+
 const BackLink = styled(Link)`
   display: block;
   margin: 1.5rem auto 0 auto;
@@ -95,37 +95,32 @@ const Error = styled.p`
   margin: 0;
 `;
 
-export default function LoginPage() {
 
+export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   // const [error, setError] = useState('');
-
   const { trigger, isMutating, error, data } = useSWRMutation(
     "/login",
-   loginRequest
+    loginRequest
   );
-
-
- 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-    
-      return alert('Please enter both email and password.');
+      // return alert('Please enter both email and password.');
     }
 
-    console.log('Email:', email,'Password:', password);
+    console.log('Email:', email, 'Password:', password);
 
     try {
       const result = await trigger({ email, password }); // POST request
       localStorage.setItem("jwtToken", result.token);
-      alert("Login successful!");
+      navigate('/dashboard');
     } catch (err) {
       console.error(err);
     }
-    alert('Login successful!');
   };
 
   return (
