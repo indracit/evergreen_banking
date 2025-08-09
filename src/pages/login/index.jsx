@@ -2,8 +2,22 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 import { Link } from 'react-router';
+import useSWRMutation from "swr/mutation";
 
-
+ const loginRequest =  async (url, { arg }) => {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(arg),
+      });
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+      return response.json();
+    }
+    
 const BackLink = styled(Link)`
   display: block;
   margin: 1.5rem auto 0 auto;
@@ -82,18 +96,35 @@ const Error = styled.p`
 `;
 
 export default function LoginPage() {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const { trigger, isMutating, error, data } = useSWRMutation(
+    "/login",
+   loginRequest
+  );
+
+
+ 
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      setError('Please enter both email and password.');
-      return;
+    
+      return alert('Please enter both email and password.');
     }
-    setError('');
-    // Handle login logic here
+
+    console.log('Email:', email,'Password:', password);
+
+    try {
+      const result = await trigger({ email, password }); // POST request
+      localStorage.setItem("jwtToken", result.token);
+      alert("Login successful!");
+    } catch (err) {
+      console.error(err);
+    }
     alert('Login successful!');
   };
 
@@ -120,9 +151,13 @@ export default function LoginPage() {
               required
             />
             {error && <Error>{error}</Error>}
-            <Button type="submit">Login</Button>
+            <Button type="submit" disabled={isMutating} >
+                {isMutating ? "Logging in..." : "Login"}
+            </Button>
           </div>
         </form>
+         {error && <p style={{ color: "red" }}>{error.message}</p>}
+      {data && <p style={{ color: "green" }}>Welcome!</p>}
         <BackLink to="/">← Back to Home</BackLink>
       </LoginBox>
     </Container>

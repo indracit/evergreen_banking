@@ -1,19 +1,6 @@
 // src/mocks/browser.js
 import { setupWorker } from 'msw/browser'
 import { http, HttpResponse } from 'msw';
-import jwt from "jsonwebtoken";
-
-const accessTokenSecret = "IndraCITS";  
-const refreshTokenSecret = "jithupandian";
-
-
-function generateAccessToken(user) {
-  return jwt.sign({ userId: user.id, email: user.email }, accessTokenSecret, { expiresIn: '15m' });
-}
-
-function generateRefreshToken(user) {
-  return jwt.sign({ userId: user.id, email: user.email }, refreshTokenSecret, { expiresIn: '7d' });
-}
 
 
 const handlers = [
@@ -25,9 +12,13 @@ const handlers = [
         { path: '/', element: 'Home' }
       ])),
 
-  http.get('/login', () => HttpResponse.json({
-        "message": "Login successful!"
-      })),
+  http.post('/login', async ({ request }) => {
+    const body = await request.json(); // ✅ parse incoming request
+    return HttpResponse.json({
+      received: body,
+      message: "Login successful (mocked)"
+    });
+  }),
 ]
 
 export const worker = setupWorker(...handlers);
